@@ -21,7 +21,6 @@ use libmpv_sys::mpv_event;
 use crate::{mpv::mpv_err, *};
 
 use std::ffi::CString;
-use std::marker::PhantomData;
 use std::os::raw as ctype;
 use std::ptr::NonNull;
 use std::slice;
@@ -64,7 +63,6 @@ impl Mpv {
             Ok(_) => EventContext {
                 ctx: self.ctx,
                 wakeup_callback_cleanup: None,
-                _does_not_outlive: PhantomData::<&Self>,
             },
             Err(_) => panic!("Event context already exists"),
         }
@@ -160,15 +158,14 @@ unsafe extern "C" fn wu_wrapper<F: Fn() + Send + 'static>(ctx: *mut ctype::c_voi
 }
 
 /// Context to listen to events.
-pub struct EventContext<'parent> {
+pub struct EventContext {
     ctx: NonNull<libmpv_sys::mpv_handle>,
     wakeup_callback_cleanup: Option<Box<dyn FnOnce()>>,
-    _does_not_outlive: PhantomData<&'parent Mpv>,
 }
 
-unsafe impl<'parent> Send for EventContext<'parent> {}
+unsafe impl Send for EventContext {}
 
-impl<'parent> EventContext<'parent> {
+impl EventContext {
     /// Enable an event.
     pub fn enable_event(&self, ev: events::EventId) -> Result<()> {
         mpv_err((), unsafe {
