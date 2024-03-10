@@ -500,6 +500,7 @@ impl Mpv {
         let cstr_list: Vec<CString> = args.iter().map(|s| CString::new(*s).unwrap()).collect();
         let mut cstr_ptr_list: Vec<*const std::os::raw::c_char> =
             cstr_list.iter().map(|s| s.as_ptr()).collect();
+        cstr_ptr_list.push(std::ptr::null());
 
         mpv_err((), unsafe {
             libmpv_sys::mpv_command_async(
