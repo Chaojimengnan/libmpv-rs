@@ -495,6 +495,21 @@ impl Mpv {
         })
     }
 
+    /// same as `command` but async version
+    pub fn command_async(&self, reply_userdata: u64, args: &[&str]) -> Result<()> {
+        let cstr_list: Vec<CString> = args.iter().map(|s| CString::new(*s).unwrap()).collect();
+        let mut cstr_ptr_list: Vec<*const std::os::raw::c_char> =
+            cstr_list.iter().map(|s| s.as_ptr()).collect();
+
+        mpv_err((), unsafe {
+            libmpv_sys::mpv_command_async(
+                self.ctx.as_ptr(),
+                reply_userdata,
+                cstr_ptr_list.as_mut_ptr(),
+            )
+        })
+    }
+
     /// Set the value of a property.
     pub fn set_property<T: SetData>(&self, name: &str, data: T) -> Result<()> {
         let name = CString::new(name)?;
