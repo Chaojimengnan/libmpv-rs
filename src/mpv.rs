@@ -510,6 +510,13 @@ impl Mpv {
         })
     }
 
+    pub fn request_log_messages(&self, min_level: &str) -> Result<()> {
+        let raw = CString::new(min_level)?;
+        mpv_err((), unsafe {
+            libmpv_sys::mpv_request_log_messages(self.ctx.as_ptr(), raw.as_ptr())
+        })
+    }
+
     /// Set the value of a property.
     pub fn set_property<T: SetData>(&self, name: &str, data: T) -> Result<()> {
         let name = CString::new(name)?;
