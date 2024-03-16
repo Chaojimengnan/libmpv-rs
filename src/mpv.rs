@@ -495,6 +495,17 @@ impl Mpv {
         })
     }
 
+    pub fn command2(&self, args: &[&str]) -> Result<()> {
+        let cstr_list: Vec<CString> = args.iter().map(|s| CString::new(*s).unwrap()).collect();
+        let mut cstr_ptr_list: Vec<*const std::os::raw::c_char> =
+            cstr_list.iter().map(|s| s.as_ptr()).collect();
+        cstr_ptr_list.push(std::ptr::null());
+
+        mpv_err((), unsafe {
+            libmpv_sys::mpv_command(self.ctx.as_ptr(), cstr_ptr_list.as_mut_ptr())
+        })
+    }
+
     /// same as `command` but async version
     pub fn command_async(&self, reply_userdata: u64, args: &[&str]) -> Result<()> {
         let cstr_list: Vec<CString> = args.iter().map(|s| CString::new(*s).unwrap()).collect();
