@@ -392,7 +392,7 @@ impl FileState {
 
 /// Context passed to the `initializer` of `Mpv::with_initialzer`.
 pub struct MpvInitializer {
-    ctx: *mut libmpv_sys::mpv_handle,
+    pub ctx: *mut libmpv_sys::mpv_handle,
 }
 
 impl MpvInitializer {
